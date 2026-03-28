@@ -1,70 +1,76 @@
 import pygame
 import random
-
+import time
 pygame.init()
-pygame.font.init()
 
-screen_x = 800
-screen_y = 600
-screen = pygame.display.set_mode((screen_x, screen_y))
-pygame.display.set_caption("Catch the falling blocks")
-clock = pygame.time.Clock()
-font = pygame.font.SysFont("Arial", 24)
+x = 900
+y = 700
 
-player_width = 50
-player_height = 20
-player_x = screen_x // 2 - player_width // 2
-player_y = screen_y - player_height - 10
-player_vel = 5
+screen = pygame.display.set_mode((x, y))
 
-block_size = 30
-block_vel = 3
-block_x = random.randint(0, screen_x - block_size)
-block_y = 0
+class Bin(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("C:\\Users\\kiewj\\Desktop\\pro gd\\recycle\\bin.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (40, 60))
+        self.rect = self.image.get_rect()
 
+class Recycle(pygame.sprite.Sprite):
+     def __init__(self, img):
+        super().__init__()
+        self.image = pygame.image.load("C:\\Users\\kiewj\\Desktop\\pro gd\\recycle" + img).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (30, 30))
+        self.rect = self.image.get_rect()
+
+class Nonrecycle(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("C:\\Users\\kiewj\\Desktop\\pro gd\\recycle\\plasticbag.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (30, 30))
+        self.rect = self.image.get_rect()
+
+def changebackground(img):
+    bg = pygame.image.load("C:\\Users\\kiewj\\Desktop\\pro gd\\recycle" + img)
+    bg = pygame.transform.scale(bg, (x, y))
+    screen.blit(bg, (0, 0))
+
+images = ["item1.png", "box.png", "pencil.png"]
+item_list = pygame.sprite.Group()
+all_sprites = pygame.sprite.Group()
+plastic = pygame.sprite.Group()
+
+for i in range(50):
+    item = Recycle(random.choice(images))
+    item.rect.x = random.randint(0, x)
+    item.rect.y = random.randint(0, y)
+    item_list.add(item)
+    all_sprites.add(item)
+
+for i in range(20):
+    item = Nonrecycle()
+    item.rect.x = random.randint(0, x)
+    item.rect.y = random.randint(0, y)
+    plastic.add(item)
+    all_sprites.add(item)
+
+bin = Bin()
+all_sprites.add(bin)
+
+run = True
 score = 0
+clock = pygame.time.Clock()
+start_time = time.time()
+font = pygame.font.SysFont("Arial", 18)
+pygame.font.init()
+text = font.render(f"Score: {}".format(score), True, "Black")
 
-while True:
-    clock.tick(60)
-    screen.fill("white")   
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] and player_x > 0:
-        player_x -= player_vel
-    if keys[pygame.K_RIGHT] and player_x < screen_x - player_width:
-        player_x += player_vel
 
-    block_y += block_vel
 
-    player_rect = pygame.Rect(player_x, player_y, player_width, player_height)
-    block_rect = pygame.Rect(block_x, block_y, block_size, block_size)
 
-    if player_rect.colliderect(block_rect):
-        score += 1
-        block_x = random.randint(0, screen_x - block_size)
-        block_y = 0
-        block_vel += 0.3  
 
-    if block_y > screen_y:
-        block_x = random.randint(0, screen_x - block_size)
-        block_y = 0
 
-    if score >= 10:
-        wintext = font.render("You Won!", True, "black")
-        screen.blit(wintext, (screen_x//2, screen_y//2))
-
-    
-    pygame.draw.rect(screen, "blue", player_rect)
-    pygame.draw.rect(screen, "red", block_rect)
-
-    score_text = font.render(f"Score: {score}", True, "black")
-    screen.blit(score_text, (10, 10))
-
-    pygame.display.update()
 
 
 
